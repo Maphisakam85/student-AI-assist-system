@@ -1,0 +1,1184 @@
+{
+  "name": "student assist AI",
+  "nodes": [
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Webhook').item.json.body.message }}",
+                    "rightValue": "quiz",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    },
+                    "id": "70bf0203-274f-435c-8b7c-52e47e7f0282"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "quiz"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "de8b033b-bedc-4c75-a791-ee8175bb3601",
+                    "leftValue": "={{ $('Webhook').item.json.body.message }}",
+                    "rightValue": "study",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "study"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "5c4b868b-40b8-407c-a8a9-83cc41067789",
+                    "leftValue": "={{ $('Webhook').item.json.body.message }}",
+                    "rightValue": "summarize",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "summarize"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "a4a162aa-70b7-42be-a305-00e4b308b29c",
+                    "leftValue": "={{ $('Webhook').item.json.body.message }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "default"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "none",
+          "ignoreCase": false
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -256,
+        224
+      ],
+      "id": "93087fa6-eb4a-470e-9c74-da313e1a021b",
+      "name": "Switch",
+      "alwaysOutputData": false,
+      "executeOnce": false
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://openrouter.ai/api/v1/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer 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"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "JSON",
+        "body": "={   \"model\": \"meta-llama/llama-3.1-8b-instruct\",   \"messages\": [     {       \"role\": \"system\",       \"content\": \"You are a quiz generator for students. Create 5 multiple-choice questions with answers using this {{ $('Webhook').item.json.body.message }} . Keep it structured and clear.\"     },     {       \"role\": \"user\",       \"content\": \"{{ $('Webhook').item.json.body.message }}\"     }   ] }\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        192,
+        0
+      ],
+      "id": "e622579c-1d30-496c-83c6-b1d37e12c6ef",
+      "name": "Quiz_Request",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://openrouter.ai/api/v1/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer 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"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "JSON",
+        "body": "={   \"model\": \"meta-llama/llama-3.1-8b-instruct\",   \"messages\": [     {       \"role\": \"system\",       \"content\": \"You are a study planner. Create a daily study plans based on the topic in plain text. Break it into steps over days.\"     },     {       \"role\": \"user\",       \"content\": \"{{ $('Webhook').item.json.body.message }} \"     }   ] }\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        192,
+        176
+      ],
+      "id": "3d55f157-f995-4443-8881-e98e2def32bd",
+      "name": "Study_request",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://openrouter.ai/api/v1/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer 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"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "JSON",
+        "body": "={   \"model\": \"meta-llama/llama-3.1-8b-instruct\",   \"messages\": [     {       \"role\": \"system\",       \"content\": \"You are a summarization assistant.Summarize content into short  points for studying.\"     },     {       \"role\": \"user\",       \"content\": \"{{ $('Webhook').item.json.body.message }}\"     }   ] }\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        192,
+        352
+      ],
+      "id": "df6a0af1-f33d-40ab-9e09-e053a7798c4e",
+      "name": "summary_request",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://openrouter.ai/api/v1/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer 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"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "JSON",
+        "body": "={   \"model\": \"meta-llama/llama-3.1-8b-instruct\",   \"messages\": [     {       \"role\": \"system\",       \"content\": \" {{ $('Webhook').item.json.body.message }} \"     },     {       \"role\": \"user\",       \"content\": \"{{ $('Webhook').item.json.body.message }}\"     }   ] }",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        192,
+        512
+      ],
+      "id": "26a1a95e-f96c-46fd-a889-ab33b8e406b1",
+      "name": "default_request",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "15_iMUSCKvl6_mNvpVWh7qgJrhzu7FgW1GfUhICDMlMU",
+          "mode": "list",
+          "cachedResultName": "student_assist_memory",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/15_iMUSCKvl6_mNvpVWh7qgJrhzu7FgW1GfUhICDMlMU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "memory",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/15_iMUSCKvl6_mNvpVWh7qgJrhzu7FgW1GfUhICDMlMU/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "chat_id",
+              "lookupValue": "={{ $json.chat_id}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -704,
+        160
+      ],
+      "id": "6394d56d-8188-44a5-9bb8-5b62aeea1b3f",
+      "name": "Get row(s) in sheet",
+      "executeOnce": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "po6dsnLoo9gyXqXG",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return {\n  messages: [\n    {\n      role: \"system\",\n      content: \"You are Student Assist AI. Help students learn clearly and step-by-step.\"\n    },\n    ...items\n      .map(i => ({\n        role: i.json.role,\n        content: i.json.message\n      }))\n      .filter(m => m.role && m.content)   // ✅ remove broken rows\n      .map(m => ({\n        role: String(m.role),\n        content: Array.isArray(m.content) ? m.content[0] : String(m.content)\n      })),\n    {\n      role: \"user\",\n      content: String($input.first().json.messages)\n    }\n  ]\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -480,
+        256
+      ],
+      "id": "5028ff25-8f54-4083-af88-1bac0f3521d9",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "15_iMUSCKvl6_mNvpVWh7qgJrhzu7FgW1GfUhICDMlMU",
+          "mode": "list",
+          "cachedResultName": "student_assist_memory",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/15_iMUSCKvl6_mNvpVWh7qgJrhzu7FgW1GfUhICDMlMU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "memory",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/15_iMUSCKvl6_mNvpVWh7qgJrhzu7FgW1GfUhICDMlMU/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "chat_id": "={{ $('Webhook').item.json.body.chat_id }}",
+            "role": "user",
+            "messages": "={{ $('Webhook').item.json.body.message }}",
+            "timestamp": "={{ $now  }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "chat_id",
+              "displayName": "chat_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "role",
+              "displayName": "role",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "messages",
+              "displayName": "messages",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "timestamp",
+              "displayName": "timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        0,
+        352
+      ],
+      "id": "b15bc1f3-b3da-4071-aded-0c65147bac7c",
+      "name": "Append row in sheet2",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "po6dsnLoo9gyXqXG",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "15_iMUSCKvl6_mNvpVWh7qgJrhzu7FgW1GfUhICDMlMU",
+          "mode": "list",
+          "cachedResultName": "student_assist_memory",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/15_iMUSCKvl6_mNvpVWh7qgJrhzu7FgW1GfUhICDMlMU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "memory",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/15_iMUSCKvl6_mNvpVWh7qgJrhzu7FgW1GfUhICDMlMU/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "chat_id": "={{ $('Webhook').item.json.body.chat_id }}",
+            "role": "user",
+            "messages": "={{ $('Webhook').item.json.body.message }}",
+            "timestamp": "={{ $now  }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "chat_id",
+              "displayName": "chat_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "role",
+              "displayName": "role",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "messages",
+              "displayName": "messages",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "timestamp",
+              "displayName": "timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        0,
+        176
+      ],
+      "id": "a8b530ec-7c97-4054-bb34-4da3e4444d66",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "po6dsnLoo9gyXqXG",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "15_iMUSCKvl6_mNvpVWh7qgJrhzu7FgW1GfUhICDMlMU",
+          "mode": "list",
+          "cachedResultName": "student_assist_memory",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/15_iMUSCKvl6_mNvpVWh7qgJrhzu7FgW1GfUhICDMlMU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "memory",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/15_iMUSCKvl6_mNvpVWh7qgJrhzu7FgW1GfUhICDMlMU/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "chat_id": "={{ $('Webhook').item.json.body.chat_id }}",
+            "role": "user",
+            "messages": "={{ $('Webhook').item.json.body.message }}",
+            "timestamp": "={{ $now  }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "chat_id",
+              "displayName": "chat_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "role",
+              "displayName": "role",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "messages",
+              "displayName": "messages",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "timestamp",
+              "displayName": "timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        0,
+        512
+      ],
+      "id": "480e63f5-cfd0-4f82-be4f-227ff7c831c7",
+      "name": "Append row in sheet3",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "po6dsnLoo9gyXqXG",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "15_iMUSCKvl6_mNvpVWh7qgJrhzu7FgW1GfUhICDMlMU",
+          "mode": "list",
+          "cachedResultName": "student_assist_memory",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/15_iMUSCKvl6_mNvpVWh7qgJrhzu7FgW1GfUhICDMlMU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "memory",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/15_iMUSCKvl6_mNvpVWh7qgJrhzu7FgW1GfUhICDMlMU/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "chat_id": "={{ $('Webhook').item.json.body.chat_id }}",
+            "role": "user",
+            "messages": "={{ $('Webhook').item.json.body.message }}",
+            "timestamp": "={{ $now  }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "chat_id",
+              "displayName": "chat_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "role",
+              "displayName": "role",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "messages",
+              "displayName": "messages",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "timestamp",
+              "displayName": "timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        0,
+        0
+      ],
+      "id": "76136493-1613-4cf0-8f45-283e916f7fdd",
+      "name": "Append row in sheet4",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "po6dsnLoo9gyXqXG",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "/student-assistant",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -1408,
+        256
+      ],
+      "id": "4305a840-d82e-4bcb-a4a5-f3089693446b",
+      "name": "Webhook",
+      "webhookId": "f890b7ca-a87d-4e6d-b20d-1b0f5defc7c7"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"reply\": $json.reply } }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        896,
+        512
+      ],
+      "id": "6eecb64f-d4e7-4d15-9f24-ee2199788683",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n  let text = item.json.choices?.[0]?.message?.content || \"\";\n\n  text = text.replace(/[*_#`>-]/g, \"\");\n  text = text.replace(/(\\d+)\\.\\s*/g, \"$1. \");\n  text = text.replace(/\\*\\s*/g, \"• \");\n\n  // Keep line breaks clean\n  text = text.replace(/\\n\\s*\\n/g, \"\\n\");\n  text = text.replace(/[ \\t]+/g, \" \");\n\n  text = text.replace(/This summary.*$/i, \"\");\n  text = text.trim();\n\n  return {\n    json: {\n      reply: text\n    }\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        640,
+        512
+      ],
+      "id": "276d2749-9bae-4f79-89ad-a3aec8cf63a0",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "15_iMUSCKvl6_mNvpVWh7qgJrhzu7FgW1GfUhICDMlMU",
+          "mode": "list",
+          "cachedResultName": "student_assist_memory",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/15_iMUSCKvl6_mNvpVWh7qgJrhzu7FgW1GfUhICDMlMU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "memory",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/15_iMUSCKvl6_mNvpVWh7qgJrhzu7FgW1GfUhICDMlMU/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "chat_id": "={{ $('Webhook').item.json.body.chat_id }}",
+            "role": "assistant",
+            "messages": "={{ $('Webhook').item.json.body.message }}",
+            "timestamp": "={{ $now }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "chat_id",
+              "displayName": "chat_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "role",
+              "displayName": "role",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "messages",
+              "displayName": "messages",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "timestamp",
+              "displayName": "timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        624,
+        0
+      ],
+      "id": "52c54955-8d78-4b4c-86aa-cb79dee54290",
+      "name": "Append row in sheet1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "po6dsnLoo9gyXqXG",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "ec0cf786-12e1-4a32-b335-9ce886c6c98f",
+              "leftValue": "={{ $json.chat_id}}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "f68d0e80-5f99-4a55-bf86-1bc1231af93a",
+              "leftValue": "",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -960,
+        256
+      ],
+      "id": "232280cd-35ed-40b0-9602-06fd8cd21caf",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "15_iMUSCKvl6_mNvpVWh7qgJrhzu7FgW1GfUhICDMlMU",
+          "mode": "list",
+          "cachedResultName": "student_assist_memory",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/15_iMUSCKvl6_mNvpVWh7qgJrhzu7FgW1GfUhICDMlMU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "memory",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/15_iMUSCKvl6_mNvpVWh7qgJrhzu7FgW1GfUhICDMlMU/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "chat_id": "={{ $('Webhook').item.json.body.chat_id }}",
+            "role": "assistant",
+            "messages": "={{ $('Webhook').item.json.body.message }}",
+            "timestamp": "={{ $now }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "chat_id",
+              "displayName": "chat_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "role",
+              "displayName": "role",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "messages",
+              "displayName": "messages",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "timestamp",
+              "displayName": "timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -704,
+        352
+      ],
+      "id": "7cce5518-943d-4db7-a5cc-e80a5f5f0ce1",
+      "name": "Append row in sheet5",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "po6dsnLoo9gyXqXG",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "15_iMUSCKvl6_mNvpVWh7qgJrhzu7FgW1GfUhICDMlMU",
+          "mode": "list",
+          "cachedResultName": "student_assist_memory",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/15_iMUSCKvl6_mNvpVWh7qgJrhzu7FgW1GfUhICDMlMU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "memory",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/15_iMUSCKvl6_mNvpVWh7qgJrhzu7FgW1GfUhICDMlMU/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "chat_id",
+              "lookupValue": "={{ $json.body.chat_id}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -1168,
+        256
+      ],
+      "id": "cbb85946-a314-4785-9886-5fbf7b03caf5",
+      "name": "Get row(s) in sheet1",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "po6dsnLoo9gyXqXG",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet4",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Append row in sheet2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Append row in sheet3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Quiz_Request": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Append row in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Study_request": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Append row in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "summary_request": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Append row in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "default_request": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Append row in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet2": {
+      "main": [
+        [
+          {
+            "node": "summary_request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Study_request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet3": {
+      "main": [
+        [
+          {
+            "node": "default_request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet4": {
+      "main": [
+        [
+          {
+            "node": "Quiz_Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Append row in sheet5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet5": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet1": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "b391468a-ab25-42a6-a407-672d15d3ad8e",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "168c233e6596343f42b258237e07bdce188a8fc29cd76a96c20000f187c0d37b"
+  },
+  "id": "5h5lhbOM3OgLgd6K",
+  "tags": []
+}
