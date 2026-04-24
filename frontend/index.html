@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Student Assist</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 flex items-center justify-center h-screen">
+
+  <!-- ✅ FIX: added h-[90vh] -->
+  <div class="w-full max-w-md h-[90vh] bg-white shadow-xl rounded-2xl flex flex-col overflow-hidden">
+    
+    <!-- Header -->
+    <div class="bg-blue-600 text-white p-4 text-center text-xl font-semibold">
+      Student Assist 🤖
+    </div>
+
+    <!-- ✅ FIX: added flex flex-col -->
+    <div id="chat" class="flex-1 p-4 overflow-y-auto space-y-3 bg-gray-50 flex flex-col">
+      <div class="text-gray-400 text-center text-sm">Start chatting...</div>
+    </div>
+
+    <!-- Input Area -->
+    <div class="p-3 border-t flex gap-2">
+      <input
+        id="msg"
+        type="text"
+        placeholder="Type your message..."
+        class="flex-1 border rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        onkeydown="if(event.key==='Enter') sendMessage()"
+      />
+      <button
+        onclick="sendMessage()"
+        class="bg-blue-600 text-white px-4 py-2 rounded-xl hover:bg-blue-700 transition"
+      >
+        Send
+      </button>
+    </div>
+  </div>
+
+  <script>
+    const chat = document.getElementById("chat");
+
+    function scrollToBottom() {
+      setTimeout(() => {
+        chat.scrollTop = chat.scrollHeight;
+      }, 50);
+    }
+
+    function addMessage(text, sender) {
+      const div = document.createElement("div");
+
+      div.className = `p-3 rounded-xl max-w-[80%] break-words ${
+        sender === "user"
+          ? "bg-blue-600 text-white self-end ml-auto"
+          : "bg-gray-200 text-gray-800"
+      }`;
+
+      div.innerText = text;
+      chat.appendChild(div);
+
+      scrollToBottom();
+    }
+
+    async function sendMessage() {
+      const input = document.getElementById("msg");
+      const message = input.value.trim();
+      if (!message) return;
+
+      addMessage(message, "user");
+      input.value = "";
+
+      const loading = document.createElement("div");
+      loading.className = "text-gray-400 text-sm";
+      loading.innerText = "Thinking...";
+      chat.appendChild(loading);
+
+      scrollToBottom();
+
+      try {
+        const res = await fetch("https://kaymoolite.app.n8n.cloud/webhook/student-assistant", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            chat_id: "user1",
+            message: message
+          })
+        });
+
+        if (!res.ok) throw new Error("Server error");
+
+        const data = await res.json();
+
+        console.log("FULL RESPONSE:", data);
+
+        loading.remove();
+
+        let reply = "⚠️ No response";
+
+        if (data.reply) {
+          reply = data.reply;
+        } else if (data.message) {
+          reply = data.message;
+        } else if (typeof data === "string") {
+          reply = data;
+        }
+
+        addMessage(reply, "bot");
+        scrollToBottom();
+
+      } catch (err) {
+        loading.remove();
+        addMessage("⚠️ Error connecting to server", "bot");
+        console.error(err);
+      }
+    }
+  </script>
+
+</body>
+</html>
